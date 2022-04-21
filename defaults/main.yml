@@ -1,0 +1,26 @@
+---
+nfs_server_ipa_server: 'ipa.example.com'  # FreeIPA/RedHat IdM server to manage Kerberos principals
+
+nfs_server_export_default_hosts: '*'                    # By default, export to <world>
+nfs_server_export_default_mode: '0755'                  # Must be quoted due to variable expansion
+nfs_server_export_default_options: 'rw'                 # When the exports defined below have no options,
+                                                        # these are the defaults
+nfs_server_export_default_security: 'krb5:krb5p:krb5i'  # Which Kerberos modes are allowed;
+                                                        # krb5: authentication only
+                                                        # krb5i: authentication and integrity
+                                                        # krb5p: authentication, integrity and encryption
+nfs_server_exports: []
+#  - path: '/exports/home'
+#    hosts: '10.0.0.0/8'
+#    security: 'krb5p'
+#  - path: '/exports/public'
+#    options: 'ro'
+#    mode: '02775'
+#    group: 'employees'  # usergroup that will own the directory on the filesystem, defaults to root
+
+# NFS homedir scripts
+# Configure the server with a set of scripts that will automatically create
+# homedirectories for users that log in.
+# NOTE: this requires sudo permissions (preferably in IPA) set up for users to run
+# and it is currently hardcoded to use /exports/home as the directory on the NFS server
+nfs_server_deploy_homedir_scripts: false

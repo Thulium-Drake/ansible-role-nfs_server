@@ -1,0 +1,4 @@
+---
+collections:
+  - 'ansible.posix'
+  - 'freeipa.ansible_freeipa'

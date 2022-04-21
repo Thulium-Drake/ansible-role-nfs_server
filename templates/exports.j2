@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+{% for export in nfs_server_exports %}
+{{ export['path'] }} {{ export['hosts'] | default(nfs_server_export_default_hosts) }}({{ export['options'] | default(nfs_server_export_default_options) }},sec={{ export['security'] | default(nfs_server_export_default_security) }})
+{% endfor %}

@@ -1,0 +1,89 @@
+---
+- name: 'Include OS specific vars'
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+  no_log: true
+
+- name: 'Ensure dependencies'
+  ansible.builtin.package:
+    name:
+      - 'nfs-utils'
+    state: 'present'
+
+- name: 'Ensure firewalld services'
+  ansible.posix.firewalld:
+    service: "{{ nfs_firewalld_service }}"
+    permanent: true
+    state: 'enabled'
+  loop:
+    - 'nfs'
+    - 'mountd'
+    - 'rpc-bind'
+  loop_control:
+    loop_var: 'nfs_firewalld_service'
+
+- name: 'Ensure Kerberos Principal'
+  freeipa.ansible_freeipa.ipaservice:
+    name: "nfs/{{ ansible_facts['fqdn'] }}@{{ ipaclient_domain | upper }}"
+    state: 'present'
+    ipaadmin_principal: "{{ ipaadmin_principal }}"
+    ipaadmin_password: "{{ ipaadmin_password }}"
+  delegate_to: "{{ nfs_server_ipa_server }}"
+  register: 'nfs_kerberos_principal'
+
+- name: 'Retrieve keytab'  # noqa no-handler
+  ansible.builtin.shell: |
+    kinit -k
+    ipa-getkeytab -p nfs/$(hostname -f)@{{ ipaclient_domain | upper }} -k /etc/krb5.keytab
+  notify: 'reload nfs'
+  changed_when: true
+  when: nfs_kerberos_principal['changed']
+
+- name: 'Ensure exported directories'
+  ansible.builtin.file:
+    state: 'directory'
+    owner: "{{ nfs_server_export['owner'] | default('root') }}"
+    group: "{{ nfs_server_export['owner'] | default('root') }}"
+    path: "{{ nfs_server_export['path'] }}"
+    mode: "{{ nfs_server_export['mode'] | default(nfs_server_export_default_mode) }}"
+  loop: "{{ nfs_server_exports }}"
+  loop_control:
+    loop_var: 'nfs_server_export'
+
+- name: 'Ensure exports'
+  ansible.builtin.template:
+    src: 'exports.j2'
+    dest: '/etc/exports'
+    mode: 0644
+    owner: 'root'
+    group: 'root'
+  notify: 'reload exports'
+
+- name: 'Ensure system services'
+  ansible.builtin.service:
+    name: "{{ nfs_server_service }}"
+    state: 'started'
+    enabled: true
+  loop: "{{ nfs_server_service_list }}"
+  loop_control:
+    loop_var: 'nfs_server_service'
+
+- name: 'Ensure NFS homedir creation scripts'
+  ansible.builtin.copy:
+    src: "{{ nfs_server_script['src'] }}"
+    dest: "{{ nfs_server_script['dest'] }}"
+    mode: "{{ nfs_server_script['mode'] }}"
+    owner: 'root'
+    group: 'root'
+  loop:
+    - src: '01_mknfshome.conf.sh'
+      dest: '/etc/profile.d/01_mknfshome.conf.sh'
+      mode: '0644'
+    - src: '02_mknfshome.sh'
+      dest: '/etc/profile.d/02_mknfshome.sh'
+      mode: '0644'
+    - src: 'mkhome.sh'
+      dest: '/exports/mkhome.sh'
+      mode: '0755'
+  loop_control:
+    loop_var: 'nfs_server_script'
+  when: nfs_server_deploy_homedir_scripts

@@ -1,0 +1,11 @@
+---
+- name: 'reload nfs'
+  ansible.builtin.service:
+    name: "{{ nfs_server_service }}"
+    state: 'restarted'
+  loop: "{{ nfs_server_service_list }}"
+  loop_control:
+    loop_var: 'nfs_server_service'
+
+- name: 'reload exports'
+  ansible.builtin.command: /usr/sbin/exportfs -ar
