@@ -8,7 +8,7 @@
         image: "registry.element-networks.nl/tools/molecule",
         commands: [
           "molecule --version",
-          "ansible-galaxy install -r requirements.yml"
+          "ansible-galaxy install -r requirements.yml",
           "molecule lint",
           "molecule syntax"
         ],
