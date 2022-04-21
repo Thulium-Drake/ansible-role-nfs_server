@@ -12,6 +12,7 @@
 - name: 'Ensure firewalld services'
   ansible.posix.firewalld:
     service: "{{ nfs_firewalld_service }}"
+    immediate: true
     permanent: true
     state: 'enabled'
   loop:
