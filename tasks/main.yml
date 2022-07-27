@@ -9,6 +9,11 @@
       - 'nfs-utils'
     state: 'present'
 
+- name: "Set up disk quota"
+  ansible.builtin.include_tasks:
+    file: 'quota.yml'
+  when: nfs_server_enable_quota
+
 - name: 'Ensure firewalld services'
   ansible.posix.firewalld:
     service: "{{ nfs_firewalld_service }}"
@@ -19,6 +24,7 @@
     - 'nfs'
     - 'mountd'
     - 'rpc-bind'
+    - "{{ (nfs_server_enable_quota) | ternary('rquotad', omit) }}"
   loop_control:
     loop_var: 'nfs_firewalld_service'
 

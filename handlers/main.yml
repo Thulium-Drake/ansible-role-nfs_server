@@ -9,3 +9,11 @@
 
 - name: 'reload exports'
   ansible.builtin.command: /usr/sbin/exportfs -ar
+
+- name: 'remount filesystems'
+  ansible.posix.mount:
+    path: "{{ quota_mount['mountpoint'] }}"
+    state: 'remounted'
+  loop: "{{ nfs_server_quota_filesystems }}"
+  loop_control:
+    loop_var: 'quota_mount'

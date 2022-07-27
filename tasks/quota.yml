@@ -1,0 +1,47 @@
+---
+- name: 'Ensure packages'
+  ansible.builtin.package:
+    name:
+      - 'quota'
+      - 'quota-rpc'
+    state: 'present'
+
+- name: 'Ensure mountpoints'
+  ansible.posix.mount:
+    path: "{{ quota_mount['mountpoint'] }}"
+    src: "{{ quota_mount['device'] }}"
+    fstype: 'xfs'
+    opts: 'defaults,nodev,nosuid,usrquota,grpquota'  # These are taken from a default install of RHEL8
+    state: 'mounted'
+  loop: "{{ nfs_server_quota_filesystems }}"
+  loop_control:
+    loop_var: 'quota_mount'
+  notify: 'remount filesystems'
+
+- name: 'Flush handlers'
+  ansible.builtin.meta: 'flush_handlers'
+
+- name: 'Ensure quota enabled'
+  ansible.builtin.command: quotaon {{ quota_mount['mountpoint'] }}
+  register: 'quotaon_output'
+  changed_when: quotaon_output['rc'] == 1
+  failed_when: quotaon_output['rc'] == 2 or quotaon_output['rc'] > 3
+  loop: "{{ nfs_server_quota_filesystems }}"
+  loop_control:
+    loop_var: 'quota_mount'
+
+- name: 'Set default quota'
+  ansible.builtin.command: xfs_quota -x \
+    -c 'limit bsoft={{ nfs_server_default_quota['block_soft'] }} bhard={{ nfs_server_default_quota['block_hard'] }} -d' \
+    -c 'limit isoft={{ nfs_server_default_quota['inode_soft'] }} ihard={{ nfs_server_default_quota['inode_hard'] }} -d' \
+    {{ quota_mount['mountpoint'] }}
+  changed_when: true  # there's no means to check current default quota
+  loop: "{{ nfs_server_quota_filesystems }}"
+  loop_control:
+    loop_var: 'quota_mount'
+
+- name: 'Ensure rpc-quota daemon'
+  ansible.builtin.service:
+    name: 'rpc-rquotad'
+    state: 'started'
+    enabled: true

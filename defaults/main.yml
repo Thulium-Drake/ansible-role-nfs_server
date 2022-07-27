@@ -24,3 +24,23 @@ nfs_server_exports: []
 # NOTE: this requires sudo permissions (preferably in IPA) set up for users to run
 # and it is currently hardcoded to use /exports/home as the directory on the NFS server
 nfs_server_deploy_homedir_scripts: false
+
+# Disk quota
+# For safe operation, ensure that all disks that have quotas enabled are _NOT_ on the
+# root filesystem. This role assumes that the filesystems are XFS (due to how the tools
+# work)
+nfs_server_enable_quota: false
+nfs_server_quota_filesystems: []
+# nfs_server_quota_filesystems:
+#   - mountpoint: '/home'
+#     device: '/dev/mapper/rhel-home'
+
+# Default quotas set if no other quota matches
+# NOTE: You cannot disable quota's for users by setting them to 0
+# If you want to disable quota's for a certain user/group, set the quota
+# to something really big
+nfs_server_default_quota:
+  block_soft: 500M
+  block_hard: 600M
+  inode_soft: 10000
+  inode_hard: 15000
