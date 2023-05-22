@@ -1,5 +1,5 @@
 ---
-- name: 'reload nfs'
+- name: 'Reload nfs'
   ansible.builtin.service:
     name: "{{ nfs_server_service }}"
     state: 'restarted'
@@ -7,10 +7,11 @@
   loop_control:
     loop_var: 'nfs_server_service'
 
-- name: 'reload exports'
+- name: 'Reload exports'
   ansible.builtin.command: /usr/sbin/exportfs -ar
+  changed_when: true
 
-- name: 'remount filesystems'
+- name: 'Remount filesystems'
   ansible.posix.mount:
     path: "{{ quota_mount['mountpoint'] }}"
     state: 'remounted'

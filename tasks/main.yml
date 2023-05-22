@@ -41,7 +41,7 @@
   ansible.builtin.shell: |
     kinit -k
     ipa-getkeytab -p nfs/$(hostname -f)@{{ ipaclient_domain | upper }} -k /etc/krb5.keytab
-  notify: 'reload nfs'
+  notify: 'Reload nfs'
   changed_when: true
   when: nfs_kerberos_principal['changed']
 
@@ -60,10 +60,10 @@
   ansible.builtin.template:
     src: 'exports.j2'
     dest: '/etc/exports'
-    mode: 0644
+    mode: '0644'
     owner: 'root'
     group: 'root'
-  notify: 'reload exports'
+  notify: 'Reload exports'
 
 - name: 'Ensure system services'
   ansible.builtin.service:
