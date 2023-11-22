@@ -29,18 +29,31 @@ nfs_server_deploy_homedir_scripts: false
 # For safe operation, ensure that all disks that have quotas enabled are _NOT_ on the
 # root filesystem. This role assumes that the filesystems are XFS (due to how the tools
 # work)
+#
+# Also note that inodes are created dynamically on XFS, so actually limiting them might not
+# be necessary.
 nfs_server_enable_quota: false
 nfs_server_quota_filesystems: []
 # nfs_server_quota_filesystems:
 #   - mountpoint: '/home'
 #     device: '/dev/mapper/rhel-home'
+#     u_block_soft: 2000M
+#     u_block_hard: 2100M
 
 # Default quotas set if no other quota matches
-# NOTE: You cannot disable quota's for users by setting them to 0
-# If you want to disable quota's for a certain user/group, set the quota
-# to something really big
+# If you have default quota's set, in order to disable a quota for a certain user/group, do not set it to 0, but instead set it to something
+# really big. As the default quota will override any 0-values found.
+#
+# By default, no quota's are set, but you can set fallback values if you so desire
+#
+# Also note that inodes are created dynamically on XFS, so actually limiting them might not
+# be necessary.
 nfs_server_default_quota:
-  block_soft: 500M
-  block_hard: 600M
-  inode_soft: 10000
-  inode_hard: 15000
+  g_block_soft: 0
+  g_block_hard: 0
+  g_inode_soft: 0
+  g_inode_hard: 0
+  u_block_soft: 0
+  u_block_hard: 0
+  u_inode_soft: 0
+  u_inode_hard: 0
