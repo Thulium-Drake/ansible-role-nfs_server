@@ -33,10 +33,10 @@
 
 - name: 'Set default user and group quota for share'
   ansible.builtin.command: xfs_quota -x \
-    -c 'limit bsoft={{ quota_mount['u_block_soft'] | default(nfs_server_default_quota['u_block_soft']) }} bhard={{ quota_mount['u_block_soft'] | default(nfs_server_default_quota['u_block_hard']) }} -d' \
-    -c 'limit bsoft={{ quota_mount['u_inode_soft'] | default(nfs_server_default_quota['u_inode_soft']) }} bhard={{ quota_mount['u_inode_soft'] | default(nfs_server_default_quota['u_inode_hard']) }} -d' \
-    -c 'limit bsoft={{ quota_mount['g_block_soft'] | default(nfs_server_default_quota['g_block_soft']) }} bhard={{ quota_mount['g_block_soft'] | default(nfs_server_default_quota['g_block_hard']) }} -d -g' \
-    -c 'limit bsoft={{ quota_mount['g_inode_soft'] | default(nfs_server_default_quota['g_inode_soft']) }} bhard={{ quota_mount['g_inode_soft'] | default(nfs_server_default_quota['g_inode_hard']) }} -d -g' \
+    -c "limit bsoft={{ quota_mount['u_block_soft'] | default(nfs_server_default_quota['u_block_soft']) }} bhard={{ quota_mount['u_block_soft'] | default(nfs_server_default_quota['u_block_hard']) }} -d" \
+    -c "limit isoft={{ quota_mount['u_inode_soft'] | default(nfs_server_default_quota['u_inode_soft']) }} ihard={{ quota_mount['u_inode_soft'] | default(nfs_server_default_quota['u_inode_hard']) }} -d" \
+    -c "limit bsoft={{ quota_mount['g_block_soft'] | default(nfs_server_default_quota['g_block_soft']) }} bhard={{ quota_mount['g_block_soft'] | default(nfs_server_default_quota['g_block_hard']) }} -d -g" \
+    -c "limit isoft={{ quota_mount['g_inode_soft'] | default(nfs_server_default_quota['g_inode_soft']) }} ihard={{ quota_mount['g_inode_soft'] | default(nfs_server_default_quota['g_inode_hard']) }} -d -g" \
     {{ quota_mount['mountpoint'] }}
   changed_when: true  # there's no means to check current default quota
   loop: "{{ nfs_server_quota_filesystems }}"
