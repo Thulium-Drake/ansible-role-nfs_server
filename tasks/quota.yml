@@ -17,7 +17,7 @@
   loop: "{{ nfs_server_quota_filesystems }}"
   loop_control:
     loop_var: 'quota_mount'
-  notify: 'remount filesystems'
+  notify: 'Remount filesystems'
 
 - name: 'Flush handlers'
   ansible.builtin.meta: 'flush_handlers'
