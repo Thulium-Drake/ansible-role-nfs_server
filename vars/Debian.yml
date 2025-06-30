@@ -1,0 +1,12 @@
+---
+nfs_server_service_list:
+  - 'nfs-server'
+
+nfs_server_packages:
+  - 'nfs-kernel-server'
+  - 'gssproxy'
+
+nfs_server_quota_packages:
+  - 'quota'
+
+nfs_server_quota_daemon: ''

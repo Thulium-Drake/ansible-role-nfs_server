@@ -24,6 +24,8 @@ This was addressed by setting up the following:
 The role can set up the scripts I used as well, but they are currently hardcoded to work from /exports/home.
 
 ## Quota's
+NOTE: Quota's are only supported on XFS storage and remote quota reporting is only supported on RHEL-like OSes.
+
 This role can configure the NFS server with user/group quota's as well, this makes use of the the xfs_quota program and
 features commonly found on RHEL-like systems.
 

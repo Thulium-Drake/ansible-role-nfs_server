@@ -2,9 +2,7 @@
 # yamllint disable rule:line-length
 - name: 'Ensure packages'
   ansible.builtin.package:
-    name:
-      - 'quota'
-      - 'quota-rpc'
+    name: "{{ nfs_server_quota_packages }}"
     state: 'present'
 
 - name: 'Ensure mountpoints'
@@ -45,6 +43,7 @@
 
 - name: 'Ensure rpc-quota daemon'
   ansible.builtin.service:
-    name: 'rpc-rquotad'
+    name: "{{ nfs_server_quota_daemon }}"
     state: 'started'
     enabled: true
+  when: nfs_server_quota_daemon != ''
