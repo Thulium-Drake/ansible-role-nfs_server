@@ -1,0 +1,12 @@
+---
+nfs_server_service_list:
+  - 'nfs-server'
+
+nfs_server_packages:
+  - 'nfs-utils'
+
+nfs_server_quota_packages:
+  - 'quota'
+  - 'quota-rpc'
+
+nfs_server_quota_daemon: 'rpc-rquotad'
