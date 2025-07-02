@@ -12,8 +12,7 @@
 
 - name: 'Ensure dependencies'
   ansible.builtin.package:
-    name:
-      - "{{ nfs_server_packages }}"
+    name: "{{ nfs_server_packages }}"
     state: 'present'
 
 - name: "Set up disk quota"
