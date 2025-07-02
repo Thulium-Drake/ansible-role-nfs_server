@@ -94,6 +94,7 @@
   loop: "{{ nfs_server_service_list }}"
   loop_control:
     loop_var: 'nfs_server_service'
+  notify: 'Reload nfs'
 
 - name: 'Ensure NFS homedir creation scripts'
   ansible.builtin.copy:
