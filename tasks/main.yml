@@ -41,6 +41,7 @@
     state: 'present'
     ipaadmin_principal: "{{ ipaadmin_principal }}"
     ipaadmin_password: "{{ ipaadmin_password }}"
+  when: nfs_server_ipa_enabled
   delegate_to: "{{ nfs_server_ipa_server }}"
   register: 'nfs_kerberos_principal'
 
@@ -50,7 +51,9 @@
     ipa-getkeytab -p nfs/$(hostname -f)@{{ ipaclient_domain | upper }} -k /etc/krb5.keytab
   notify: 'Reload nfs'
   changed_when: true
-  when: nfs_kerberos_principal['changed']
+  when:
+    - nfs_server_ipa_enabled
+    - nfs_kerberos_principal['changed']
 
 - name: 'Ensure exported directories'
   ansible.builtin.file:

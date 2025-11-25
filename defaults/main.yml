@@ -1,4 +1,7 @@
 ---
+nfs_server_ipa_enabled: true              # Whether or not to enable IdM (and Kerberos)
+                                          # Check that you change the default_security to sys!
+
 nfs_server_ipa_server: 'ipa.example.com'  # FreeIPA/RedHat IdM server to manage Kerberos principals
 
 nfs_server_export_default_hosts: '*'                    # By default, export to <world>
